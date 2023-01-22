@@ -22,6 +22,12 @@ const PostSchema = new mongoose.Schema(
             type: Array,
             require: false,
         },
+        cloudinary_id:{
+            type: String,
+        },
+        image:{
+            type: String,
+        }
     },
 
     { timestamps: true }

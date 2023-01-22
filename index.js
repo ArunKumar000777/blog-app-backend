@@ -22,6 +22,7 @@ mongoose
     .then(console.log(" mongodb connected"))
     .catch((err) => console.error(err));
 app.use(cors({ origin: ["https://blog-app-arun.onrender.com","http://localhost:3000"], methods: ["GET", "POST", "DELETE", "PUT", "PATCH"] }));
+// app.use(cors({ origin: 'http://localhost:3000', methods: ["GET", "POST", "DELETE", "PUT", "PATCH"] }));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
