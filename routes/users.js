@@ -5,8 +5,6 @@ const bcrypt = require("bcrypt");
 const cloudinary = require("../utils/cloudinary");
 const upload = require("../utils/multer");
 
-
-
 // GET USER
 router.get("/:id", async (req, res) => {
     try {
@@ -18,27 +16,24 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-
 router.delete("/:id", async (req, res) => {
     if (req.body.userId === req.params.id) {
-      try {
-        const user = await User.findById(req.params.id);
         try {
-          await Post.deleteMany({ username: user.username });
-          await User.findByIdAndDelete(req.params.id);
-          res.status(200).json("User has been deleted...");
+            const user = await User.findById(req.params.id);
+            try {
+                await Post.deleteMany({ username: user.username });
+                await User.findByIdAndDelete(req.params.id);
+                res.status(200).json("User has been deleted...");
+            } catch (err) {
+                res.status(500).json(err);
+            }
         } catch (err) {
-          res.status(500).json(err);
+            res.status(404).json("User not found!");
         }
-      } catch (err) {
-        res.status(404).json("User not found!");
-      }
     } else {
-      res.status(401).json("You can delete only your account!");
+        res.status(401).json("You can delete only your account!");
     }
-  });
-
-
+});
 
 //! update using cloudinary
 
@@ -49,6 +44,7 @@ router.put("/:id", upload.single("profilePic"), async (req, res) => {
     if (userId === user_id) {
         try {
             const user = await User.findById(user_id);
+
             let result;
             if (req.file) {
                 if (user?.cloudinary_id) {
@@ -63,8 +59,22 @@ router.put("/:id", upload.single("profilePic"), async (req, res) => {
                 cloudinary_id: result?.public_id || user.cloudinary_id,
                 profilePic: result?.secure_url || user.profilePic,
             };
+
             const updateProfile = await User.findByIdAndUpdate(user_id, data, { new: true });
-            res.status(200).json({updateProfile,message:`${updateProfile.username} has been successfully updated your profile }`});
+            console.log(updateProfile);
+            if (req.body.username) {
+                const posts = await Post.find({ userId });
+                // Update the username on each post
+                for (const post of posts) {
+                    post.username = updateProfile?.username;
+                    await post.save();
+                }
+            }
+
+            res.status(200).json({
+                updateProfile,
+                message: `${updateProfile.username} has been successfully updated your profile }`,
+            });
         } catch (error) {
             res.status(500).json({ message: error });
         }
@@ -73,4 +83,3 @@ router.put("/:id", upload.single("profilePic"), async (req, res) => {
     }
 });
 module.exports = router;
-

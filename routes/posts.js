@@ -6,11 +6,11 @@ const upload = require("../utils/multer");
 //CREATE POST
 
 router.post("/", upload.single("image"), async (req, res) => {
-    const { username, title, desc } = req.body;
+    const { username, title, desc, userId } = req.body;
 
     // const newPost = new Post(req.body);
-    console.log('req.body',req.body);
-    console.log('req.file',req.file)
+    console.log("req.body", req.body);
+    console.log("req.file", req.file);
 
     try {
         const result = await cloudinary.uploader.upload(req.file.path);
@@ -23,6 +23,7 @@ router.post("/", upload.single("image"), async (req, res) => {
             desc,
             image,
             cloudinary_id,
+            userId,
         });
         await newPost.save();
         res.status(201).json({ newPost, message: "posted successfully" });
@@ -62,9 +63,10 @@ router.put("/:id", async (req, res) => {
 // DELETE POST
 
 router.delete("/:id", async (req, res) => {
+    console.log(req.body);
     try {
         const post = await Post.findById(req.params.id);
-        if (post.username === req.body.username) {
+        if (post.userId === req.body.userId) {
             try {
                 await post.delete();
                 res.status(200).json("your post has been deleted...");
@@ -105,7 +107,7 @@ router.get("/", async (req, res) => {
                 },
             });
         } else {
-            posts = await Post.find();
+            posts = await Post.find().sort({ createdAt: -1 });
         }
         // posts.sort((a,b) =>)
         res.status(200).json(posts);
