@@ -8,10 +8,6 @@ const upload = require("../utils/multer");
 router.post("/", upload.single("image"), async (req, res) => {
     const { username, title, desc, userId } = req.body;
 
-    // const newPost = new Post(req.body);
-    console.log("req.body", req.body);
-    console.log("req.file", req.file);
-
     try {
         const result = await cloudinary.uploader.upload(req.file.path);
         const cloudinary_id = result.public_id;
@@ -28,9 +24,6 @@ router.post("/", upload.single("image"), async (req, res) => {
         await newPost.save();
         res.status(201).json({ newPost, message: "posted successfully" });
 
-        // const savedPost = await newPost.save();
-        // res.json(result);
-        // res.status(200).json(savedPost);
     } catch (error) {
         res.status(500).json(error);
     }
@@ -63,7 +56,6 @@ router.put("/:id", async (req, res) => {
 // DELETE POST
 
 router.delete("/:id", async (req, res) => {
-    console.log(req.body);
     try {
         const post = await Post.findById(req.params.id);
         if (post.userId === req.body.userId) {
