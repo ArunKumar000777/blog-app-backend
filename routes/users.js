@@ -60,7 +60,11 @@ router.put("/:id", upload.single("profilePic"), async (req, res) => {
                 profilePic: result?.secure_url || user.profilePic,
             };
 
-            const updateProfile = await User.findByIdAndUpdate(user_id, data, { new: true });
+            const updateProfile = await User.findByIdAndUpdate(user_id, data, {
+                useFindAndModify: false,
+                runValidators: true,
+                new: true,
+            });
             if (req.body.username) {
                 const posts = await Post.find({ userId });
                 // Update the username on each post

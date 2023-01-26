@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
-        cloudinary_id:{
+        cloudinary_id: {
             type: String,
         },
     },
